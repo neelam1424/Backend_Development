@@ -1,3 +1,5 @@
+### Before starting with thw database design first know what datapoint you want to save in the database and what relation to need between them then start the coding part
+
 #### step1:- npm init -y
 #### step2:- npm i express
 #### step4:- npm i mongoose
