@@ -69,10 +69,10 @@ connectDB();
 
 ```
 ###  Custom API REsponse and Error Handling
-#### database is connected in bd > index.js but we are going to listen it in src > index.js
+#### database is connected in db > index.js but we are going to listen it in src > index.js
 ### Express
 ### - 1: Request :- how data is coming and how to handle 
-- options 1: req.params(whenever we get data from url it comes from params)
+- option 1: req.params(whenever we get data from url it comes from params)
 - option 2: req.body(configuration for data coming from body)
 - Sometimes data is collected from cookies 
 ### - 2: Response :- how data we have to send 
@@ -140,19 +140,201 @@ export {ApiError}
 
 ```
 ```
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
+### User and Video model with hooks and JWT in Advance
+#### file in model folder "user.model.js" and "video.model.js"()
+```
+user.model.js
+import mongoose , {Schema} from "mongoose"
+
+const userSchema = new Schema(
+    {
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        index: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+    },
+    fullname: {
+        type: String,
+        required: true,
+        trim: true,
+        index: true
+    },
+    avatar: {
+        type: String,//cloudinary
+        required: true,
+    },
+    coverImage: {
+        type: String, //cloudinary url
+    },
+    watchHistory: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Video"
+        }
+    ],
+    password:{
+        type: String,
+        required: [true, "Password is required"]
+    },
+    refreshToken:{
+        type: String,
+    }
+},
+{
+    timestamps: true,
+}
+)
+
+
+export const User = mongoose.model("User", userSchema)
+```
+#### video.model.js
+
+#### Small things: watchHistory makes project complex for this we install special package "npm i mongoose-aggregate-paginate-v2" this package allow you to write aggregation queries
+```
+videoSchema.plugin(mongooseAggregatePaginate)
+```
+
+```
+import mongoose ,{ Schema} from "mongoose";
+const videoSchema = new Schema(
+    {
+       videoFile:{
+        type: String,
+        required: true,
+       }, 
+       thumbnail:{
+        type: String,
+        required: true,
+       }, 
+       title:{
+        type: String,
+        required: true,
+       },
+       description:{
+        type: String,
+        required: true,
+       },
+       duration:{
+        type: Number,
+        required: true,
+       },   
+       views:{
+        type: Number,
+        default:0,
+       }, 
+       isPublished:{
+        type: Boolean,
+        default: true
+       },
+       owner:{
+        type: Schema.Types.ObjectId,
+        ref: "User"
+       },
+    },
+    {
+        timestamps:true,
+    }
+)
+
+export const Video = mongoose.model("Video", videoSchema)
+```
+## what to do? when we are saving data before that take password and encrypt it
+#### packages:- 1. bcrypt.(help ypou to hash your password) 2. bcryptjs  & JWT(json Web token for cryptography token) :- npm i bcrypt jsonwebtoken
+#### user.model.json
+### How to Encrypt?
+#### Direct encryption is not possible:- therefore we need you take help from mongoose
+#### 1:- Pre hook:- just before saving data we can run this hook with code
+### in pre callback dont use this "()=>{}" because in JS we dont get this context ...we need database context so therefore use async function(next) {} ///what to do? when we are saving data before that take password and encrypt it
+```
+// bcryption syntax 
+in the pre hook 
+userSchema.user("action", async callbackfunction (next(as this is a middleware)){
+    this.varibale = bcrypt("on whom to apply bcryption" , "how many round to salt the data")
+})
+```
+### Password encrypt 
+#### encrypt only when change password is asked so apply if condition
+```
+userSchema.pre("save", async function(next){
+    if(!this.isModified("password)) return next(); // negative check
+    this.pasword = brcypt.hash(this.password, 10 )
+    next()
+})
+```
+### now make methods so when ever we import user we need to check with user also
+### Custom methods
+```
+userSchema.methods.isPasswordCorrect = async function (password){
+    // check password
+    return await bcrypt.compare(password,this.password)
+}
+```
+### JWT
+### What is JWT ? :- Bearer token (whoever have this token I will pass the entry )
+#### In .env 
+### ACCESS TOKEN
+#### We are using cookie and sessions both we have strong security 
+```
+ACCESS_TOKEN_SECRET=deTcgiE5DBYhYx0WKBkX78xg9q0MUMGyFY5lWHsqCLi9QC3Z3mxFI9KCqUMcwILL
+
+ACCESS_TOKEN_EXPIRY=1d
+```
+### REFRESH_TOKEN_SECRET(logic later) //stored in database
+```
+REFRESH_TOKEN_SECRET=deTcgiE5DBYhYx0WKBkX78xg9q0MUMGyFY5lWHsqCLi9QC3Z3mxFI9KCqUMcwILL
+
+REFRESH_TOKEN_EXPIRY=10d
+```
+#### Genrating Access and Refresh token using mongoose methods
+#### Access token
+```
+userSchema.methods.generateAccessToken = function() {
+    jwt.sign(
+        // payload 
+        {
+            _id: this._id, //from mongodb
+            email: this.email,
+            username: this.username,
+            fullName: this.fullName
+        },
+        // access token
+        process.env.ACCESS_TOKEN_SECRET,
+        //Object for expiry
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+
+        }
+    )
+
+}
+```
+#### Refresh token
+```
+userSchema.methods.generateRefreshToken = function() {
+    jwt.sign(
+        //payload
+        {
+            _id: this._id,
+            
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
+}
+```
 ####
 ####
 ####
