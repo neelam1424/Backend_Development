@@ -335,16 +335,79 @@ userSchema.methods.generateRefreshToken = function() {
     )
 }
 ```
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
+### How to upload file in backend? (make seperate utility file for file upload for reuse and )
+#### Services we are going to use (cloudinary,) npm(express-fileupload || multer(we are going to use this))
+#### npm i cloudinary and npm i multer
+### Cloudinary 
+#### download cloudinary
+### Strategy 
+- we will get user do file upload (through multer)
+- Cloudinary is Service (which just upload the file on server)
+- we will take file from user using multer and keep the file temporary in local server
+- then using cloudinary we will take the file from local server and upload it on server
+
+### Why this 2 steps?
+- In case of fail the file on uploading on server ... get get a chance to retry to upload file on server if required (good for production level)
+### Cloudinary file goal:- file will come from file system
+- will get file from local server
+- remove from local server
+#### we are using fs from node which is file system help to open , read , write file
+#### imp for us unlink:- used to remove the file 
+### This code may have bug as this is just prepration
+```
+import {v2 as cloudinary} from "cloudinary"
+import fs from fs
+
+
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
+
+
+const uploadOnCloudinary = async (localFilePath) => {
+    try {
+        if(!localFilePath) return null
+        //upload the file on cloudinary
+        const response = await cloudinary.uploader.upload(localFilePath, {
+            resource_type: "auto"
+        })
+        // file has been uploaded successfully
+        console.log("file is uploaded on cloudinary", response.url);
+        return response
+    } catch (error) {
+        // remove the locally saved temporary file as the upload operation got failed
+        fs.unlinkSync(localFilePath)
+        return null;
+    }
+
+}
+
+export {uploadOnCloudinary}
+```
+### Using multer we create multer
+### middleware > multer.middleware.js
+```
+import multer from "multer";
+
+const storage = multer.diskStorage({
+    destination: function (req,file,cb){
+        cb(null, "./public/temp")
+    },
+    filename: function(req, file,cb){
+        cb(null,file.originalname)
+    }
+})
+
+export const upload = multer(
+    {
+        storage,
+    }
+)
+```
+# ---------------------Setup done----------------------
 ####
 ####
 ####
