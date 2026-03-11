@@ -408,20 +408,65 @@ export const upload = multer(
 )
 ```
 # ---------------------Setup done----------------------
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
+## HTTP crash course | http Methods | http headers
+### HTTP [Hyper Text Transfer Protocol]
+#### we use when 2 server client and server want to comunicate with each other
+#### keywords: -URL (Uniform Resource Locator), URI(uniform Resource Identifier),URN (Unidorm Resource Name)
+## What are HTTP Headers
+#### When we send http request with that we need to send some more information [metadata -----> key-value send along with request & response]
+## What headers do?
+#### Used for caching(if data available in cache),authentication(headers,bearer token), manage state(user state guest user, cart )
+## Types of headers
+- Request Headers -----> data from Client
+- Response Headers -----> data from Server
+- Representation headers -----> which encoding/compression
+- Payload Headers -----> data(_id,email)
+## Most Common Headers
+- Accept: what type of data it accept mostly in server (format ex:-application /json)
+- User-Agent (from which application request came ex:- which browser, postman?)
+- Authorization :- (ex:- Bearer, JWT token)
+- Content-type:- (image,pdf?)
+- Cookie:- 
+- Cache-control:- (time to keep data)
+### CORS header
+- Access-Control-Allow-Origin:- from which source are allowed
+- Access-Control-Allow-Credentials
+- Access-Control-Allow-Method
+### Security
+- Cross-Origin-Embedder-Policy
+- Cross-Origin-Opener-Policy
+- Cross-Security-Policy
+- X-XSS-Protection
+## HTTP METHODS
+### Basic set of operations that can be used to interact with server
+- GET : retrive a resource
+- HEAD : No message body (response headers only)
+- OPTIONS : what operations are available
+- TRACE : loopback test (get same data) 
+- DELETE : remove a resource
+- PUT : replace a resource
+- POST : interact with resource (mostly added)
+- PATCH : change part a resource
+## HTTP STATUS CODE
+- 1XX : Informational
+- 2XX : Success
+- 3XX : Redirection
+- 4XX : Client error
+- 5XX : Server error
+#### ------------------------
+- 100: Continue
+- 102: Processing
+- 200: ok
+- 201: Created
+- 202: accepted
+- 307: temporary redirect
+- 308: permanent redirect
+- 400: Bad request
+- 401: Unauthorized
+- 402: Payment required
+- 404: Not found
+- 500: Internal Server Error
+- 504: Gateway time out
 ####
 ####
 ####
