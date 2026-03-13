@@ -467,24 +467,197 @@ export const upload = multer(
 - 404: Not found
 - 500: Internal Server Error
 - 504: Gateway time out
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
-####
+## ---------------- ACTUAL BACKEND JOURNEY :- Complete guide for router and controller with debugging------------------------
+### REGISTER USER and ALL SUB PARTS
+#### make file in controller > user.controller.js
+### 1:- [!!!Create method to send message] We have created asyncHandler.js in utils which will act like a wrapper in every function so it can handle function in async manner without need to write the async await logic again and again ....So import 
+```
+import {asyncHandler} from '../utils/asyncHandler.js'
 
+// 1:- creating user registration function 
+// 2:- wrap the whole function with asyncHandler 
+// 3:- within the asynHandler we create one more async function
+// 4:- give status as response
+
+const registerUser = asyncHandler( async (req,res) => {
+    //send response with status[statuscode] and json response with message
+    res.status(200).json({
+        message: "ok"
+    })
+}
+)
+
+export {registerUser}
+```
+### 2:- create routes [run code when this url are hit] 
+- step 1:- create new file in routes []
+- step 2:- create router and export in user.routes.js
+```
+// Basic template for router
+
+import {Router} from "express";
+
+const router = Router()
+
+export default router
+```
+###  We have exported the usercontroller and userRouter but where to import?.....In index.js? NO we try to keep index.js clean as much as we can
+### We import all of this in app.js
+```
+app.js
+
+
+import express from "express"
+import cors from "cors"
+import cookieParser from "cookie-parser"
+
+const app= express()
+
+app.use(cors({
+    //cors option
+    origin: process.env.CORS_ORIGIN,
+    credentials:true,
+}))
+
+//configuration for data conversion, url data handling, and files handling
+app.use(express.json({limit: "16kb"}))
+app.use(express.urlencoded({extended:true, limit: "16kb"}))
+app.use(express.static("public"))
+app.use(cookieParser())
+------------------------------------------------------router implementation
+// routes import
+
+import userRouter from './routes/user.routes.js'
+
+
+// routes declaration
+// we are using middleware because we have segregated the routes so to bring that we need to use middleware so use use "app.use"
+//https://localhost:3000/users--------->userRouter file
+app.use("/api/v1/users", userRouter)
+
+```
+#### from app.js the userRouter is called so when the control goes in userRouter ..... We need to declare route in userRouter
+### * all routes are writen in routes
+```
+> user.Router.js
+
+import {Router} from "express";
+import { registerUser } from "../controllers/user.controller.js";
+
+const router = Router()
+
+// which route to take user to
+//this takes to '/users/register'
+//what to do on this url?
+// ---> we do the method post where the function from userController is implemented function name is registerUser------> so it calls user.controller.js
+//https://localhost:3000/users--------->userRouter file
+//https://localhost:3000/users/register--------> calls registerUser from file user.controller.js
+router.route("/register").post(registerUser)
+
+
+export default router
+```
+# Logic Building | Register controller
+## ------Have to register user----------
+#### steps to register user
+#### step 1:- Get user details from frontend
+#### step 2:- validation - not empty
+#### step 3:- check if user already exists [username, email]
+#### step 4:- check for images , check for avatar (multer check)
+```
+Go to routes > userRoutes
+```
+#### step 5:- upload them to cloudinary, avatar(upload cloudinary check)
+#### step 6:- create user object [as in mongodb object are uploaded]- create entry in db [creation call(.create)]
+#### step 7:- remove password and referesh token field from response[because we dont want to send this info as response]
+#### step 8:- check for user creation
+#### step 9:- return response
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####
+####

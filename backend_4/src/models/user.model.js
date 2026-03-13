@@ -56,7 +56,7 @@ userSchema.pre("save", async function (next){
     // condition when to save this password not all the time
     if(!this.isModified("password")) return next()
         //bcrypt.hash(on whom, how many round) 
-    this.password= bcrypt.hash(this.password, 10)
+    this.password= await bcrypt.hash(this.password, 10)
     next()
 })
 
