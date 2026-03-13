@@ -52,12 +52,12 @@ const userSchema = new Schema(
 }
 )
 //next beacuse this is middleware
-userSchema.pre("save", async function (next){
+userSchema.pre("save", async function (){
     // condition when to save this password not all the time
-    if(!this.isModified("password")) return next()
+    if(!this.isModified("password")) return 
         //bcrypt.hash(on whom, how many round) 
     this.password= await bcrypt.hash(this.password, 10)
-    next()
+    
 })
 
 // method to cehck and compare the password
