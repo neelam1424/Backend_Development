@@ -3,7 +3,7 @@ import {ApiError} from '../utils/ApiError.js'
 import {User} from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
-import { response } from 'express'
+import jwt from "jsonwebtoken"
 
 
 
@@ -145,7 +145,7 @@ const loginUser = asyncHandler( async(req,res)=>{
     const {email,username,password} = req.body
 
 
-    if(!username || !email){
+    if(!username && !email){
         throw new ApiError(400, "Username or email is required")
     }
 
@@ -215,6 +215,19 @@ const logoutUser = asyncHandler(async(req,res)=>{
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User Logged Out"))
+})
+
+const refreshAccessToken = asyncHandler(async(req,res)=>{
+    const incomingRefreshToken = refreshAccessToken.cookies.refreshToken || req.body.refreshToken
+
+    if(!incomingRefreshToken){
+        throw new ApiError(401, "unauthorized request")
+    }
+
+    const decodedToken = jwt.verify(
+        incomingRefreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+    )
 })
 
 export {registerUser, loginUser, logoutUser}
